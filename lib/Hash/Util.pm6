@@ -3,6 +3,10 @@ use v6.c;
 role LockedHash {
     has int $!lock_hash;
     has int $!lock_keys;
+    has $!AT-KEY;
+    has $!ASSIGN-KEY;
+    has $!BIND-KEY;
+    has $!DELETE-KEY;
 
     sub disallowed($key --> Nil) is hidden-from-backtrace {
        die "Attempt to access disallowed key '$key' in a restricted hash"
@@ -16,12 +20,20 @@ role LockedHash {
          !! "Hash has keys '@missed.join(q/','/)' which are not in the new key set"
     }
 
+    submethod initialize(@candidates) {
+        $!AT-KEY     := @candidates[0];
+        $!ASSIGN-KEY := @candidates[1];
+        $!BIND-KEY   := @candidates[2];
+        $!DELETE-KEY := @candidates[3];
+        self
+    }
+
     method lock_hash()   { $!lock_hash = 1; self }
     method unlock_hash() { $!lock_hash = 1; self }
 
     method lock_keys(@keys)   {
         if @keys {
-            self.ASSIGN-KEY($_,Mu,True) unless self.EXISTS-KEY($_) for @keys;
+            $!ASSIGN-KEY(self,$_,Mu) unless self.EXISTS-KEY($_) for @keys;
 
             # there were keys in the hash that weren't specified
             missed( (self (-) @keys).keys ) if self.elems > @keys;
@@ -33,61 +45,62 @@ role LockedHash {
     method unlock_keys() { $!lock_keys = 0; self }
 
     method lock_value(\key) {
-        self.BIND-KEY(key,self.AT-KEY(key,True)<>,True);
+        $!BIND-KEY(self,key,$!AT-KEY(self,key)<>);
         self
     }
     method unlock_value(\key) {
-        my \value := self.AT-KEY(key,True);
-        self.DELETE-KEY(key,True);
-        self.ASSIGN-KEY(key,value,True);
+        my \value := $!AT-KEY(self,key);
+        $!DELETE-KEY(self,key);
+        $!ASSIGN-KEY(self,key,value);
         self
     }
 
-    multi method AT-KEY(::?CLASS:D: \key, \ok) is raw {
-        callwith(key)
-    }
-    multi method AT-KEY(::?CLASS:D: \key) is raw is default {
+    method AT-KEY(\key) is raw {
         self.EXISTS-KEY(key)
-          ?? $!lock_hash               # key exists
-            ?? callsame()<>              # and locked hash, so decont
-            !! callsame()                # and NO locked hash, so pass on
-          !! $!lock_keys               # key does NOT exist
-            ?? disallowed(key)           # and locked keys, so forget it
-            !! callsame()                # and NO locked keys, so pass on
+          ?? $!lock_hash                   # key exists
+            ?? $!AT-KEY(self,key)<>          # and locked hash, so decont
+            !! $!AT-KEY(self,key)            # and NO locked hash, so pass on
+          !! $!lock_keys                   # key does NOT exist
+            ?? disallowed(key)               # and locked keys, so forget it
+            !! $!AT-KEY(self,key)            # and NO locked keys, so pass on
     }
 
-    multi method ASSIGN-KEY(::?CLASS:D: \key, \value, \ok) is raw {
-        callwith(key,value)
-    }
-    multi method ASSIGN-KEY(::?CLASS:D: \key, \value) is raw is default {
+    method ASSIGN-KEY(\key, \value) is raw {
         self.EXISTS-KEY(key)
-          ?? $!lock_hash               # key exists
-            ?? readonly(key)             # and locked hash, so forget it
-            !! callsame()                # and NO locked hash, so pass on
-          !! $!lock_keys               # key does NOT exist
-            ?? disallowed(key)           # and locked keys, so forget it
-            !! callsame()                # and NO locked keys, so pass on
+          ?? $!lock_hash                   # key exists
+            ?? readonly(key)                 # and locked hash, so forget it
+            !! $!ASSIGN-KEY(self,key,value)  # and NO locked hash, so pass on
+          !! $!lock_keys                   # key does NOT exist
+            ?? disallowed(key)               # and locked keys, so forget it
+            !! $!ASSIGN-KEY(self,key,value)  # and NO locked keys, so pass on
     }
 
-    multi method BIND-KEY(::?CLASS:D: \key, \value, \ok) is raw {
-        callwith(key,value)
-    }
-    multi method BIND-KEY(::?CLASS:D: \key, \value) is raw is default {
+    method BIND-KEY(\key, \value) is raw {
         self.EXISTS-KEY(key)
-          ?? $!lock_hash               # key exists
-            ?? readonly(key)             # and locked hash, so forget it
-            !! callsame()                # and NO locked hash, so pass on
-          !! $!lock_keys               # key does NOT exist
-            ?? disallowed(key)           # and locked keys, so forget it
-            !! callsame()                # and NO locked keys, so pass on
+          ?? $!lock_hash                   # key exists
+            ?? readonly(key)                 # and locked hash, so forget it
+            !! $!BIND-KEY(self,key,value)    # and NO locked hash, so pass on
+          !! $!lock_keys                   # key does NOT exist
+            ?? disallowed(key)               # and locked keys, so forget it
+            !! $!BIND-KEY(self,key,value)    # and NO locked keys, so pass on
     }
 }
 
 class Hash::Util:ver<0.0.1>:auth<cpan:ELIZABETH> {
 
+    sub candidates(\the-hash) {
+        (
+          the-hash.can(    'AT-KEY').head,
+          the-hash.can('ASSIGN-KEY').head,
+          the-hash.can(  'BIND-KEY').head,
+          the-hash.can('DELETE-KEY').head,
+        )
+    }
+
     proto sub lock_hash(|) is export(:all) {*}
     multi sub lock_hash(Associative:D \the-hash) {
-        (the-hash does LockedHash).lock_hash
+        my @candidates := candidates(the-hash);
+        (the-hash does LockedHash).initialize(@candidates).lock_hash
     }
     multi sub lock_hash(LockedHash:D \the-hash) is default {
         the-hash.lock_hash
@@ -95,7 +108,8 @@ class Hash::Util:ver<0.0.1>:auth<cpan:ELIZABETH> {
 
     proto sub unlock_hash(|) is export(:all) {*}
     multi sub unlock_hash(Associative:D \the-hash) {
-        (the-hash does LockedHash).unlock_hash
+        my @candidates := candidates(the-hash);
+        (the-hash does LockedHash).initialize(@candidates).unlock_hash
     }
     multi sub unlock_hash(LockedHash:D \the-hash) is default {
         the-hash.unlock_hash
@@ -103,7 +117,8 @@ class Hash::Util:ver<0.0.1>:auth<cpan:ELIZABETH> {
 
     proto sub lock_keys(|) is export(:all) {*}
     multi sub lock_keys(Associative:D \the-hash, *@keys) {
-        (the-hash does LockedHash).lock_keys(@keys)
+        my @candidates := candidates(the-hash);
+        (the-hash does LockedHash).initialize(@candidates).lock_keys(@keys)
     }
     multi sub lock_keys(LockedHash:D \the-hash, *@keys) is default {
         the-hash.lock_keys(@keys)
@@ -111,7 +126,8 @@ class Hash::Util:ver<0.0.1>:auth<cpan:ELIZABETH> {
 
     proto sub unlock_keys(|) is export(:all) {*}
     multi sub unlock_keys(Associative:D \the-hash) {
-        (the-hash does LockedHash).unlock_keys
+        my @candidates := candidates(the-hash);
+        (the-hash does LockedHash).initialize(@candidates).unlock_keys
     }
     multi sub unlock_keys(LockedHash:D \the-hash) is default {
         the-hash.unlock_keys
@@ -119,7 +135,8 @@ class Hash::Util:ver<0.0.1>:auth<cpan:ELIZABETH> {
 
     proto sub lock_value(|) is export(:all) {*}
     multi sub lock_value(Associative:D \the-hash, \key) {
-        (the-hash does LockedHash).lock_value(key)
+        my @candidates := candidates(the-hash);
+        (the-hash does LockedHash).initialize(@candidates).lock_value(key)
     }
     multi sub lock_value(LockedHash:D \the-hash, \key) is default {
         the-hash.lock_value(key)
@@ -127,7 +144,8 @@ class Hash::Util:ver<0.0.1>:auth<cpan:ELIZABETH> {
 
     proto sub unlock_value(|) is export(:all) {*}
     multi sub unlock_value(Associative:D \the-hash, \key) {
-        (the-hash does LockedHash).unlock_value(key)
+        my @candidates := candidates(the-hash);
+        (the-hash does LockedHash).initialize(@candidates),unlock_value(key)
     }
     multi sub unlock_value(LockedHash:D \the-hash, \key) is default {
         the-hash.unlock_value(key)

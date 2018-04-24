@@ -8,8 +8,8 @@ dd lock_keys(%h);
 
 dd %h.AT-KEY("a") = 77;
 
-dd unlock_keys(%h);
 dd %h.AT-KEY("c");
+dd unlock_keys(%h);
 dd %h.AT-KEY("c") = 89;
 dd %h;
 
