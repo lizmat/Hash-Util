@@ -1,0 +1,22 @@
+{
+  "authors" : [
+    "Elizabeth Mattijsen"
+  ],
+  "build-depends" : [ ],
+  "depends" : [ ],
+  "description" : "Port of Perl 5's Hash::Util 0.22",
+  "license" : "Artistic-2.0",
+  "name" : "List::Util",
+  "perl" : "6.c",
+  "provides" : {
+    "List::Util" : "lib/Hash/Util.pm6"
+  },
+  "resources" : [ ],
+  "source-url" : "https://github.com/lizmat/Hash-Util.git",
+  "tags" : [
+    "UTILS",
+    "CPAN5"
+  ],
+  "test-depends" : [ ],
+  "version" : "0.0.1"
+}
