@@ -55,9 +55,9 @@ role LockedHash {
           ?? $!lock_hash                   # key exists
             ?? $!AT-KEY(self,key)<>          # and locked hash, so decont
             !! $!AT-KEY(self,key)            # and NO locked hash, so pass on
-          !! $!lock_keys                   # key does NOT exist
-            ?? disallowed(key)               # and locked keys, so forget it
-            !! $!AT-KEY(self,key)            # and NO locked keys, so pass on
+          !! $!lock_hash || $!lock_keys    # key does NOT exist
+            ?? disallowed(key)               # and locked hash/keys, forget it
+            !! $!AT-KEY(self,key)            # and NO lock, so pass on
     }
 
     method ASSIGN-KEY(\key, \value) is raw {
@@ -65,9 +65,9 @@ role LockedHash {
           ?? $!lock_hash                   # key exists
             ?? readonly(key)                 # and locked hash, so forget it
             !! $!ASSIGN-KEY(self,key,value)  # and NO locked hash, so pass on
-          !! $!lock_keys                   # key does NOT exist
-            ?? disallowed(key)               # and locked keys, so forget it
-            !! $!ASSIGN-KEY(self,key,value)  # and NO locked keys, so pass on
+          !! $!lock_hash || $!lock_keys    # key does NOT exist
+            ?? disallowed(key)               # and locked hash/keys, forget it
+            !! $!ASSIGN-KEY(self,key,value)  # and NO lock, so pass on
     }
 
     method BIND-KEY(\key, \value) is raw {
@@ -75,18 +75,20 @@ role LockedHash {
           ?? $!lock_hash                   # key exists
             ?? readonly(key)                 # and locked hash, so forget it
             !! $!BIND-KEY(self,key,value)    # and NO locked hash, so pass on
-          !! $!lock_keys                   # key does NOT exist
-            ?? disallowed(key)               # and locked keys, so forget it
-            !! $!BIND-KEY(self,key,value)    # and NO locked keys, so pass on
+          !! $!lock_hash || $!lock_keys    # key does NOT exist
+            ?? disallowed(key)               # and locked hash/keys, forget it
+            !! $!BIND-KEY(self,key,value)    # and NO lock, so pass on
     }
 
     method DELETE-KEY(\key) is raw {
         $!EXISTS-KEY(self,key)
           ?? $!lock_hash                   # key exists
             ?? delete(key,'readonly')        # and locked hash, forget it
-            !! self!delete_key(key)          # and NO locked hash, so reset
-          !! $!lock_keys                   # key does NOT exist
-            ?? delete(key,'disallowed')      # and locked keys, forget it
+            !! $!lock_keys                   # and NO locked hash
+              ?? self!delete_key(key)          # but locked keys, so fake it
+              !! $!DELETE-KEY(self,key)        # no locked keys, so do it
+          !! $!lock_hash || $!lock_keys    # key does NOT exist
+            ?? delete(key,'disallowed')      # and locked hash/keys, forget it
             !! Nil                           # not locked, so just show absence
     }
 
