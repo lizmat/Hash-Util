@@ -47,6 +47,20 @@ Hash::Util contains a set of functions that support restricted hashes. It introd
 
 By default Hash::Util does not export anything.
 
+MAYBE MAP IS ALL YOU NEED
+=========================
+
+If you want to use this module for the sole purpose of only once locking a hash into an immutable state (calling only `lock_hash` once on a hash), then it is much better to turn your hash into a `Map` upon initialization by adding the `is Map` trait:
+
+    my %hash is Map = foo => 42, bar => 23;
+
+This will have exactly the same effect as:
+
+    my %hash = foo => 42, bar => 23;
+    lock_hash(%hash);
+
+but won't need to load the `Hash::Util` module and will be much better performant because it won't need any additional run-time checks, because `Map` is the immutable version of `Hash` in Perl 6.
+
 PORTING CAVEATS
 ===============
 
@@ -59,7 +73,7 @@ Also field hashes (the tools to create inside-out objects) have not been ported 
 
     fieldhash fieldhashes
 
-Since the concept of references does not exist as such in Perl 6, it didn't make sense to seperately port the "_ref" versions of the subroutines. They are however available as aliases to the non "_ref" versions::
+Since the concept of references does not exist as such in Perl 6, it didn't make sense to separately port the "_ref" versions of the subroutines. They are however available as aliases to the non "_ref" versions::
 
     lock_hashref unlock_hashref lock_hashref_recurse unlock_hashref_recurse
     lock_ref_keys lock_ref_keys_plus unlock_ref_keys

@@ -24,18 +24,25 @@ role LockedHash {
          ?? "Hash has key '@missed[0]' which is not in the new key set"
          !! "Hash has keys '@missed.join(q/','/)' which are not in the new key set"
     }
-    sub delete($key --> Nil) is hidden-from-backtrace {
-       die "Attempt to delete readonly key '$key' from a restricted hash"
+    sub delete($key,$type --> Nil) is hidden-from-backtrace {
+       die "Attempt to delete $type key '$key' from a restricted hash"
     }
 
     #---- initialization -------------------------------------------------------
-    my constant HIDDEN := Mu.new
+    my constant HIDDEN = Mu.new
       but role { method defined { False } };     # sentinel for hidden keys
 
     submethod initialize(
       $!EXISTS-KEY,$!AT-KEY,$!ASSIGN-KEY,$!BIND-KEY,$!DELETE-KEY
     ) {
         self
+    }
+
+    #---- helper methods -------------------------------------------------------
+    method !delete_key(\key) {
+        my $value = $!AT-KEY(self,key);
+        $!ASSIGN-KEY(self,key,HIDDEN);
+        $value
     }
 
     #---- standard Associative interface ---------------------------------------
@@ -75,10 +82,12 @@ role LockedHash {
 
     method DELETE-KEY(\key) is raw {
         $!EXISTS-KEY(self,key)
-          ?? $!lock_hash || $!lock_keys    # key exists
-            ?? delete(key)                   # and locked hash/keys, forget it
-            !! $!DELETE-KEY(self,key)        # and NO locked hash, so pass on
-          !! Nil                           # key does NOT exist
+          ?? $!lock_hash                   # key exists
+            ?? delete(key,'readonly')        # and locked hash, forget it
+            !! self!delete_key(key)          # and NO locked hash, so reset
+          !! $!lock_keys                   # key does NOT exist
+            ?? delete(key,'disallowed')      # and locked keys, forget it
+            !! Nil                           # not locked, so just show absence
     }
 
     #---- behaviour modifiers --------------------------------------------------
@@ -114,10 +123,18 @@ role LockedHash {
     method hash_locked()   {  so $!lock_hash }
     method hash_unlocked() { not $!lock_hash }
 
-    method legal_keys() { self.keys.List }
-    method hidden_keys() { self.keys.grep({ .value<> =:= HIDDEN }).List }
+    method legal_keys() {
+        self.keys.List
+    }
+    method hidden_keys() {
+        use nqp;  # we need nqp::decont here for some reason
+        self.pairs.map({ .key if nqp::decont(.value) =:= HIDDEN }).List
+    }
     method all_keys(\existing,\hidden) {
-        .value<> =:= HIDDEN ?? hidden.push(.key) !! existing.push(.key)
+        use nqp;  # we need nqp::decont here for some reason
+        nqp::decont(.value) =:= HIDDEN
+          ?? hidden.push(.key)
+          !! existing.push(.key)
           for self.pairs;
         self
     }
@@ -356,6 +373,24 @@ that an individual value cannot be changed.
 
 By default Hash::Util does not export anything.
 
+=head1 MAYBE MAP IS ALL YOU NEED
+
+If you want to use this module for the sole purpose of only once locking
+a hash into an immutable state (calling only C<lock_hash> once on a hash),
+then it is much better to turn your hash into a C<Map> upon initialization
+by adding the C<is Map> trait:
+
+    my %hash is Map = foo => 42, bar => 23;
+
+This will have exactly the same effect as:
+
+    my %hash = foo => 42, bar => 23;
+    lock_hash(%hash);
+
+but won't need to load the C<Hash::Util> module and will be much better
+performant because it won't need any additional run-time checks, because
+C<Map> is the immutable version of C<Hash> in Perl 6.
+
 =head1 PORTING CAVEATS
 
 Functions that pertain to the unique implementation of Perl 5 hashes, have
@@ -371,7 +406,7 @@ everything is a true object.  This pertains to the functions:
     fieldhash fieldhashes
 
 Since the concept of references does not exist as such in Perl 6, it didn't
-make sense to seperately port the "_ref" versions of the subroutines.  They
+make sense to separately port the "_ref" versions of the subroutines.  They
 are however available as aliases to the non "_ref" versions::
 
     lock_hashref unlock_hashref lock_hashref_recurse unlock_hashref_recurse
