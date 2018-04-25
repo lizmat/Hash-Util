@@ -5,8 +5,9 @@ use Hash::Util :all;
 my @supported = <
   all_keys all_ref_keys hash_locked hash_unlocked hashref_locked
   hashref_unlocked hidden_keys hidden_ref_keys legal_keys legal_ref_keys
-  lock_hash lock_hashref lock_keys lock_keys_plus lock_ref_keys
-  lock_ref_keys_plus lock_ref_value lock_value unlock_hash unlock_hashref
+  lock_hash lock_hash_recurse lock_hashref lock_hashref_recurse lock_keys
+  lock_keys_plus lock_ref_keys lock_ref_keys_plus lock_ref_value lock_value
+  unlock_hash unlock_hash_recurse unlock_hashref unlock_hashref_recurse
   unlock_keys unlock_ref_keys unlock_ref_value unlock_value
 >.map: '&' ~ *;
 

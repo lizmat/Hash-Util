@@ -117,24 +117,29 @@ role LockedHash {
     method legal_keys() { self.keys.List }
     method hidden_keys() { self.keys.grep({ .value<> =:= HIDDEN }).List }
     method all_keys(\existing,\hidden) {
-        .value<> =:= HIDDEN ?? hidden.push($_) !! existing.push($_)
+        .value<> =:= HIDDEN ?? hidden.push(.key) !! existing.push(.key)
           for self.pairs;
         self
     }
 }
 
-#---- actual class with exportable subs ----------------------------------------
-class Hash::Util:ver<0.0.1>:auth<cpan:ELIZABETH> {
+#---- actual module with exportable subs ---------------------------------------
+module Hash::Util:ver<0.0.1>:auth<cpan:ELIZABETH> {
 
     #---- helper subs ----------------------------------------------------------
+    my List %candidates;
+    my $lock = Lock.new;
+
     sub candidates(\the-hash) {
-        (
-          the-hash.can('EXISTS-KEY').head,
-          the-hash.can(    'AT-KEY').head,
-          the-hash.can('ASSIGN-KEY').head,
-          the-hash.can(  'BIND-KEY').head,
-          the-hash.can('DELETE-KEY').head,
-        )
+        $lock.protect: {
+            %candidates{the-hash.^name} //= (
+              the-hash.can('EXISTS-KEY').head,
+              the-hash.can(    'AT-KEY').head,
+              the-hash.can('ASSIGN-KEY').head,
+              the-hash.can(  'BIND-KEY').head,
+              the-hash.can('DELETE-KEY').head,
+            )
+        }
     }
 
     #---- lock_hash / unlock_hash ----------------------------------------------
@@ -157,6 +162,29 @@ class Hash::Util:ver<0.0.1>:auth<cpan:ELIZABETH> {
         the-hash.unlock_hash
     }
     our constant &unlock_hashref is export(:all) = &unlock_hash;
+
+    #---- lock_hash_recurse / unlock_hash_recurse ------------------------------
+    our proto sub lock_hash_recurse(|) is export(:all) {*}
+    multi sub lock_hash_recurse(Associative:D \the-hash) {
+        my @candidates := candidates(the-hash);
+        (the-hash does LockedHash).initialize(|@candidates).lock_hash_recurse
+    }
+    multi sub lock_hash_recurse(LockedHash:D \the-hash) is default {
+        lock_hash_recurse($_) if $_ ~~ Associative for the-hash.values;
+        the-hash.lock_hash
+    }
+    our constant &lock_hashref_recurse is export(:all) = &lock_hash_recurse;
+
+    our proto sub unlock_hash_recurse(|) is export(:all) {*}
+    multi sub unlock_hash_recurse(Associative:D \the-hash) {
+        my @candidates := candidates(the-hash);
+        (the-hash does LockedHash).initialize(|@candidates).unlock_hash_recurse
+    }
+    multi sub unlock_hash_recurse(LockedHash:D \the-hash) is default {
+        unlock_hash_recurse($_) if $_ ~~ LockedHash for the-hash.values;
+        the-hash.unlock_hash
+    }
+    our constant &unlock_hashref_recurse is export(:all) = &unlock_hash_recurse;
 
     #---- lock_keys / lock_keys_plus / unlock_keys -----------------------------
     our proto sub lock_keys(|) is export(:all) {*}
