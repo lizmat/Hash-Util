@@ -2,9 +2,10 @@ use v6.c;
 use Test;
 use Hash::Util <
   lock_keys unlock_keys legal_keys hidden_keys all_keys
+  hash_locked hash_unlocked
 >;
 
-plan 22;
+plan 27;
 
 my @unhidden = <a b>;
 my @hidden = <c d>;
@@ -45,5 +46,12 @@ is $caught, 1, 'did we get an exception for access unexisting';
 $caught = 0;
 { %hash<e>:delete; CATCH { default { ++$caught } } }
 is $caught, 1, 'did we get an exception for attempting to delete unexisting';
+
+ok hash_locked(%hash), 'is the hash marked as locked?';
+nok hash_unlocked(%hash), 'is the hash NOT marked as unlocked?';
+
+ok unlock_keys(%hash) =:= %hash, 'does unlock_keys return %hash';
+nok hash_locked(%hash), 'is the hash NOT marked as locked?';
+ok hash_unlocked(%hash), 'is the hash marked as unlocked?';
 
 # vim: ft=perl6 expandtab sw=4

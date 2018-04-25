@@ -164,14 +164,14 @@ hash_locked HASH
 
     say "Hash is locked!" if hash_locked(%hash);
 
-Returns true if the hash and its keys are locked.
+Returns true if the hash and/or its keys are locked.
 
 hash_unlocked HASH
 ------------------
 
     say "Hash is unlocked!" if hash_unlocked(%hash);
 
-Returns true if the hash and its keys are unlocked.
+Returns true if the hash and/or its keys are **not** locked.
 
 legal_keys HASH
 ---------------

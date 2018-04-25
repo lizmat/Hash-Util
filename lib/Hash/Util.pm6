@@ -122,8 +122,8 @@ role LockedHash {
     }
 
     #---- introspection --------------------------------------------------------
-    method hash_locked()   {  so $!lock_hash }
-    method hash_unlocked() { not $!lock_hash }
+    method hash_locked()   {  so $!lock_hash || $!lock_keys }
+    method hash_unlocked() { not $!lock_hash || $!lock_keys }
 
     method legal_keys() {
         self.keys.List
@@ -186,7 +186,7 @@ module Hash::Util:ver<0.0.1>:auth<cpan:ELIZABETH> {
     our proto sub lock_hash_recurse(|) is export(:all) {*}
     multi sub lock_hash_recurse(Associative:D \the-hash) {
         my @candidates := candidates(the-hash);
-        (the-hash does LockedHash).initialize(|@candidates).lock_hash_recurse
+        lock_hash_recurse((the-hash does LockedHash).initialize(|@candidates))
     }
     multi sub lock_hash_recurse(LockedHash:D \the-hash) is default {
         lock_hash_recurse($_) if $_ ~~ Associative for the-hash.values;
@@ -197,7 +197,7 @@ module Hash::Util:ver<0.0.1>:auth<cpan:ELIZABETH> {
     our proto sub unlock_hash_recurse(|) is export(:all) {*}
     multi sub unlock_hash_recurse(Associative:D \the-hash) {
         my @candidates := candidates(the-hash);
-        (the-hash does LockedHash).initialize(|@candidates).unlock_hash_recurse
+        unlock_hash_recurse((the-hash does LockedHash).initialize(|@candidates))
     }
     multi sub unlock_hash_recurse(LockedHash:D \the-hash) is default {
         unlock_hash_recurse($_) if $_ ~~ LockedHash for the-hash.values;
@@ -510,13 +510,13 @@ Identical recursion restrictions apply as to C<lock_hash_recurse>.
 
     say "Hash is locked!" if hash_locked(%hash);
 
-Returns true if the hash and its keys are locked.
+Returns true if the hash and/or its keys are locked.
 
 =head2 hash_unlocked HASH
 
     say "Hash is unlocked!" if hash_unlocked(%hash);
 
-Returns true if the hash and its keys are unlocked.
+Returns true if the hash and/or its keys are B<not> locked.
 
 =head2 legal_keys HASH
 

@@ -1,8 +1,8 @@
 use v6.c;
 use Test;
-use Hash::Util <lock_hash unlock_hash>;
+use Hash::Util <lock_hash unlock_hash hash_locked hash_unlocked>;
 
-plan 15;
+plan 19;
 
 my %hash = a => 42, b => 666;
 
@@ -24,8 +24,12 @@ is $caught, 1, 'did we get an exception for attempting to assign unexisting';
 $caught = 0;
 { %hash<e>:delete; CATCH { default { ++$caught } } }
 is $caught, 1, 'did we get an exception for attempting to delete unexisting';
+ok hash_locked(%hash), 'is the hash marked as locked?';
+nok hash_unlocked(%hash), 'is the hash NOT marked as unlocked?';
 
 ok unlock_hash(%hash) =:= %hash, 'does unlock_hash return %hash';
+nok hash_locked(%hash), 'is the hash NOT marked as locked?';
+ok hash_unlocked(%hash), 'is the hash marked as unlocked?';
 
 is (%hash<c> = 89), 89, 'can we assign to "c"';
 is (%hash<d> = 66), 66, 'can we assign to "d"';
