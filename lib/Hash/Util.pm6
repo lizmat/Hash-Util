@@ -223,7 +223,7 @@ module Hash::Util:ver<0.0.1>:auth<cpan:ELIZABETH> {
           .initialize(|@candidates).lock_keys(@keys,:plus)
     }
     multi sub lock_keys_plus(LockedHash:D \the-hash, *@keys) is default {
-        the-hash.lock_keys_plus(@keys,:plus)
+        the-hash.lock_keys(@keys,:plus)
     }
     our constant &lock_ref_keys_plus is export(:all) = &lock_keys_plus;
 

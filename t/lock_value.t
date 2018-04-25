@@ -1,8 +1,10 @@
 use v6.c;
 use Test;
-use Hash::Util <lock_value unlock_value>;
+use Hash::Util <
+  lock_value unlock_value hash_locked hash_unlocked
+>;
 
-plan 13;
+plan 17;
 
 my %hash = a => 42, b => 666;
 
@@ -14,7 +16,13 @@ ok %hash<b>:exists, 'does "b" still exist';
 is %hash<b>, 666, 'does "b" still have the same value';
 is (%hash<e> = 271), 271, 'can we assign a new key "e"?';
 
+nok hash_locked(%hash), 'is the hash NOT marked as locked?';
+ok hash_unlocked(%hash), 'is the hash marked as unlocked?';
+
 ok unlock_value(%hash,"a") =:= %hash, 'does unlock_value return %hash';
+nok hash_locked(%hash), 'is the hash still NOT marked as locked?';
+ok hash_unlocked(%hash), 'is the hash still marked as unlocked?';
+
 is %hash<a>, 42, 'does "a" still have the same value after unlock';
 is (%hash<a> = 84), 84, 'can we change the value of "a"?';
 
