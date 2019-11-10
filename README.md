@@ -1,9 +1,7 @@
-[![Build Status](https://travis-ci.org/lizmat/Hash-Util.svg?branch=master)](https://travis-ci.org/lizmat/Hash-Util)
-
 NAME
 ====
 
-Hash::Util - Port of Perl 5's Hash::Util 0.22
+Hash::Util - Port of Perl's Hash::Util 0.22
 
 SYNOPSIS
 ========
@@ -59,21 +57,21 @@ This will have exactly the same effect as:
     my %hash = foo => 42, bar => 23;
     lock_hash(%hash);
 
-but won't need to load the `Hash::Util` module and will be much better performant because it won't need any additional run-time checks, because `Map` is the immutable version of `Hash` in Perl 6.
+but won't need to load the `Hash::Util` module and will be much better performant because it won't need any additional run-time checks, because `Map` is the immutable version of `Hash` in Raku.
 
 PORTING CAVEATS
 ===============
 
-Functions that pertain to the unique implementation of Perl 5 hashes, have **not** been ported. These include:
+Functions that pertain to the unique implementation of Perl hashes, have **not** been ported. These include:
 
     hash_seed hash_value hv_store bucket_stats
     bucket_info bucket_array hash_traversal_mask
 
-Also field hashes (the tools to create inside-out objects) have not been ported is these were deemed rather useless in the Perl 6 environment where everything is a true object. This pertains to the functions:
+Also field hashes (the tools to create inside-out objects) have not been ported is these were deemed rather useless in the Raku environment where everything is a true object. This pertains to the functions:
 
     fieldhash fieldhashes
 
-Since the concept of references does not exist as such in Perl 6, it didn't make sense to separately port the "_ref" versions of the subroutines. They are however available as aliases to the non "_ref" versions::
+Since the concept of references does not exist as such in Raku, it didn't make sense to separately port the "_ref" versions of the subroutines. They are however available as aliases to the non "_ref" versions::
 
     lock_hashref unlock_hashref lock_hashref_recurse unlock_hashref_recurse
     lock_ref_keys lock_ref_keys_plus unlock_ref_keys
@@ -211,9 +209,9 @@ Source can be located at: https://github.com/lizmat/Hash-Util . Comments and Pul
 COPYRIGHT AND LICENSE
 =====================
 
-Copyright 2018 Elizabeth Mattijsen
+Copyright 2018-2019 Elizabeth Mattijsen
 
 This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
 
-Re-imagined from the Perl 5 version as part of the CPAN Butterfly Plan. Perl 5 version originally developed by the Perl 5 Porters, subsequently maintained by Steve Hay.
+Re-imagined from the Perl version as part of the CPAN Butterfly Plan. Perl version originally developed by the Perl 5 Porters, subsequently maintained by Steve Hay.
 

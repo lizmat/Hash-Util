@@ -143,7 +143,7 @@ role LockedHash {
 }
 
 #---- actual module with exportable subs ---------------------------------------
-module Hash::Util:ver<0.0.1>:auth<cpan:ELIZABETH> {
+module Hash::Util:ver<0.0.2>:auth<cpan:ELIZABETH> {
 
     #---- helper subs ----------------------------------------------------------
     my List %candidates;
@@ -329,7 +329,7 @@ sub EXPORT(*@args, *%_) {
 
 =head1 NAME
 
-Hash::Util - Port of Perl 5's Hash::Util 0.22
+Hash::Util - Port of Perl's Hash::Util 0.22
 
 =head1 SYNOPSIS
 
@@ -391,23 +391,23 @@ This will have exactly the same effect as:
 
 but won't need to load the C<Hash::Util> module and will be much better
 performant because it won't need any additional run-time checks, because
-C<Map> is the immutable version of C<Hash> in Perl 6.
+C<Map> is the immutable version of C<Hash> in Raku.
 
 =head1 PORTING CAVEATS
 
-Functions that pertain to the unique implementation of Perl 5 hashes, have
+Functions that pertain to the unique implementation of Perl hashes, have
 B<not> been ported.  These include:
 
     hash_seed hash_value hv_store bucket_stats
     bucket_info bucket_array hash_traversal_mask
 
 Also field hashes (the tools to create inside-out objects) have not been
-ported is these were deemed rather useless in the Perl 6 environment where
+ported is these were deemed rather useless in the Raku environment where
 everything is a true object.  This pertains to the functions:
 
     fieldhash fieldhashes
 
-Since the concept of references does not exist as such in Perl 6, it didn't
+Since the concept of references does not exist as such in Raku, it didn't
 make sense to separately port the "_ref" versions of the subroutines.  They
 are however available as aliases to the non "_ref" versions::
 
@@ -556,11 +556,11 @@ Pull Requests are welcome.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2018 Elizabeth Mattijsen
+Copyright 2018-2019 Elizabeth Mattijsen
 
 This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
 
-Re-imagined from the Perl 5 version as part of the CPAN Butterfly Plan. Perl 5
+Re-imagined from the Perl version as part of the CPAN Butterfly Plan. Perl
 version originally developed by the Perl 5 Porters, subsequently maintained
 by Steve Hay.
 

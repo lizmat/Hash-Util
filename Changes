@@ -2,5 +2,8 @@ Revision history for Hash-Util
 
 {{$NEXT}}
 
+0.0.2  2019-11-10T13:14:01+01:00
+    - changed Perl 6 to Raku, Perl 5 to Perl
+
 0.0.1  2018-04-25T18:24:09+02:00
     - Initial version

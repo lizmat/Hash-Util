@@ -5,7 +5,7 @@
   ],
   "build-depends" : [ ],
   "depends" : [ ],
-  "description" : "Port of Perl 5's Hash::Util 0.22",
+  "description" : "Port of Perl's Hash::Util 0.22",
   "license" : "Artistic-2.0",
   "name" : "Hash::Util",
   "perl" : "6.c",
@@ -19,5 +19,5 @@
     "CPAN5"
   ],
   "test-depends" : [ ],
-  "version" : "0.0.1"
+  "version" : "0.0.2"
 }
