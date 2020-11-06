@@ -27,9 +27,9 @@ jobs:
       - name: Show Version
         run: raku --version
       - name: Run Tests
-        run: raku -Ilib t/01-basic.t \
-             && raku -Ilib t/02-basic.t \
-             && raku -Ilib t/lock_hash.t \
-             && raku -Ilib t/lock_keys.t \
-             && raku -Ilib t/lock_hash_recurse.t \
+        run: raku -Ilib t/01-basic.t
+             && raku -Ilib t/02-basic.t
+             && raku -Ilib t/lock_hash.t
+             && raku -Ilib t/lock_keys.t
+             && raku -Ilib t/lock_hash_recurse.t
              && raku -Ilib t/lock_value.t
