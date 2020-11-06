@@ -31,5 +31,5 @@ jobs:
              && raku -Ilib t/02-basic.t \
              && raku -Ilib t/lock_hash.t \
              && raku -Ilib t/lock_keys.t \
-	         && raku -Ilib t/lock_hash_recurse.t \
+             && raku -Ilib t/lock_hash_recurse.t \
              && raku -Ilib t/lock_value.t
