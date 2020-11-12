@@ -143,7 +143,7 @@ role LockedHash {
 }
 
 #---- actual module with exportable subs ---------------------------------------
-module Hash::Util:ver<0.0.3>:auth<cpan:ELIZABETH> {
+module Hash::Util:ver<0.0.4>:auth<cpan:ELIZABETH> {
 
     #---- helper subs ----------------------------------------------------------
     my List %candidates;
