@@ -1,4 +1,4 @@
-use v6.c;
+use v6.*;
 use Test;
 use Hash::Util <lock_hash unlock_hash hash_locked hash_unlocked>;
 
@@ -39,4 +39,4 @@ nok %hash<a>:exists, 'does "a" not exist again';
 nok %hash<a>.defined, 'is "a" not defined again';
 is (%hash<a> = 77), 77, 'can we assign to "a" again';
 
-# vim: ft=perl6 expandtab sw=4
+# vim: expandtab shiftwidth=4

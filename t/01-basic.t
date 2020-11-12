@@ -1,4 +1,4 @@
-use v6.c;
+use v6.*;
 use Test;
 use Hash::Util;
 
@@ -20,4 +20,4 @@ for @supported {
     ok defined(Hash::Util::{$_}), "is $_ externally accessible?";
 }
 
-# vim: ft=perl6 expandtab sw=4
+# vim: expandtab shiftwidth=4

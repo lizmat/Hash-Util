@@ -1,4 +1,4 @@
-use v6.c;
+use v6.*;
 use Test;
 use Hash::Util :all;
 
@@ -40,4 +40,4 @@ for @aliases -> $original, $alias {
     ok ::($original) =:= ::($alias), "is $alias same as $original";
 }
 
-# vim: ft=perl6 expandtab sw=4
+# vim: expandtab shiftwidth=4

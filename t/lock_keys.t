@@ -1,4 +1,4 @@
-use v6.c;
+use v6.*;
 use Test;
 use Hash::Util <
   lock_keys lock_keys_plus unlock_keys legal_keys hidden_keys all_keys
@@ -63,4 +63,4 @@ ok unlock_keys(%hash) =:= %hash, 'does unlock_keys return %hash';
 nok hash_locked(%hash), 'is the hash NOT marked as locked?';
 ok hash_unlocked(%hash), 'is the hash marked as unlocked?';
 
-# vim: ft=perl6 expandtab sw=4
+# vim: expandtab shiftwidth=4

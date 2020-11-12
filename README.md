@@ -1,7 +1,7 @@
 NAME
 ====
 
-Hash::Util - Port of Perl's Hash::Util 0.22
+Raku port of Perl's Hash::Util module 0.23
 
 SYNOPSIS
 ========
@@ -40,6 +40,8 @@ SYNOPSIS
 
 DESCRIPTION
 ===========
+
+This module tries to mimic the behaviour of Perl's `Hash::Util` module as closely as possible in the Raku Programming Language.
 
 Hash::Util contains a set of functions that support restricted hashes. It introduces the ability to restrict a hash to a certain set of keys. No keys outside of this set can be added. It also introduces the ability to lock an individual key so it cannot be deleted and the ability to ensure that an individual value cannot be changed.
 
@@ -209,7 +211,7 @@ Source can be located at: https://github.com/lizmat/Hash-Util . Comments and Pul
 COPYRIGHT AND LICENSE
 =====================
 
-Copyright 2018-2019 Elizabeth Mattijsen
+Copyright 2018-2020 Elizabeth Mattijsen
 
 This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
 

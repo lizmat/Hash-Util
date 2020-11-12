@@ -2,6 +2,12 @@ Revision history for Hash-Util
 
 {{$NEXT}}
 
+0.0.3  2020-11-12T13:58:00+01:00
+    - Change name of distribution
+    - Force to highest possible Raku version
+    - Update copyright year
+    - Fix improper use of submethod in role
+
 0.0.2  2019-11-10T13:14:01+01:00
     - changed Perl 6 to Raku, Perl 5 to Perl
 

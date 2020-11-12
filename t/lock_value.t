@@ -1,4 +1,4 @@
-use v6.c;
+use v6.*;
 use Test;
 use Hash::Util <
   lock_value unlock_value hash_locked hash_unlocked
@@ -33,4 +33,4 @@ is $caught, 1, 'did we get an exception for attempting to change value of "a"?';
 is %hash<a>, 84, 'did the assignment actually fail';
 is %hash<a>:delete, 84, 'can we remove "a"?';
 
-# vim: ft=perl6 expandtab sw=4
+# vim: expandtab shiftwidth=4

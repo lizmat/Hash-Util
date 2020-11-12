@@ -1,4 +1,4 @@
-use v6.c;
+use v6.*;
 use Test;
 use Hash::Util <
   lock_hash_recurse unlock_hash_recurse
@@ -37,4 +37,4 @@ ok hash_unlocked(%hash<b>), 'is the lower hash marked as unlocked?';
 nok hash_locked(%hash<c>[0]), 'is the lowest hash still NOT marked as locked?';
 ok hash_unlocked(%hash<c>[0]), 'is the lowest hash still marked as unlocked?';
 
-# vim: ft=perl6 expandtab sw=4
+# vim: expandtab shiftwidth=4

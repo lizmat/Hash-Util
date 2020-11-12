@@ -1,4 +1,4 @@
-use v6.c;
+use v6.*;
 
 #---- role to mix into Associative class ---------------------------------------
 role LockedHash {
@@ -32,7 +32,7 @@ role LockedHash {
     my constant HIDDEN = Mu.new
       but role { method defined { False } };     # sentinel for hidden keys
 
-    submethod initialize(
+    method initialize(
       $!EXISTS-KEY,$!AT-KEY,$!ASSIGN-KEY,$!BIND-KEY,$!DELETE-KEY
     ) {
         self
@@ -143,7 +143,7 @@ role LockedHash {
 }
 
 #---- actual module with exportable subs ---------------------------------------
-module Hash::Util:ver<0.0.2>:auth<cpan:ELIZABETH> {
+module Hash::Util:ver<0.0.3>:auth<cpan:ELIZABETH> {
 
     #---- helper subs ----------------------------------------------------------
     my List %candidates;
@@ -329,7 +329,7 @@ sub EXPORT(*@args, *%_) {
 
 =head1 NAME
 
-Hash::Util - Port of Perl's Hash::Util 0.22
+Raku port of Perl's Hash::Util module 0.23
 
 =head1 SYNOPSIS
 
@@ -366,6 +366,9 @@ Hash::Util - Port of Perl's Hash::Util 0.22
     unlock_hash(%hash);
 
 =head1 DESCRIPTION
+
+This module tries to mimic the behaviour of Perl's C<Hash::Util> module
+as closely as possible in the Raku Programming Language.
 
 Hash::Util contains a set of functions that support restricted hashes.
 It introduces the ability to restrict a hash to a certain set of keys.
@@ -556,7 +559,7 @@ Pull Requests are welcome.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2018-2019 Elizabeth Mattijsen
+Copyright 2018-2020 Elizabeth Mattijsen
 
 This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
 
@@ -566,4 +569,4 @@ by Steve Hay.
 
 =end pod
 
-# vim: ft=perl6 expandtab sw=4
+# vim: expandtab shiftwidth=4
