@@ -1,3 +1,5 @@
+[![Actions Status](https://github.com/lizmat/Hash-Util/workflows/test/badge.svg)](https://github.com/lizmat/Hash-Util/actions)
+
 NAME
 ====
 
@@ -204,14 +206,14 @@ SEE ALSO
 AUTHOR
 ======
 
-Elizabeth Mattijsen <liz@wenzperl.nl>
+Elizabeth Mattijsen <liz@raku.rocks>
 
 Source can be located at: https://github.com/lizmat/Hash-Util . Comments and Pull Requests are welcome.
 
 COPYRIGHT AND LICENSE
 =====================
 
-Copyright 2018-2020 Elizabeth Mattijsen
+Copyright 2018, 2019, 2020, 2021 Elizabeth Mattijsen
 
 This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
 

@@ -2,6 +2,12 @@ Revision history for Hash-Util
 
 {{$NEXT}}
 
+0.0.5  2021-09-09T19:29:45+02:00
+    - Change file extension to .rakumod
+    - Migrate to zef ecosystem
+    - Update email address
+    - Update copyright year
+
 0.0.4  2020-11-12T17:22:18+01:00
     - Throttle Raku version down to v6.d to avoid breakage
 

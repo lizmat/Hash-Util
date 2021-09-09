@@ -1,7 +1,7 @@
 use v6.d;
 
 #---- role to mix into Associative class ---------------------------------------
-role LockedHash {
+my role LockedHash {
     has int $!lock_hash;
     has int $!lock_keys;
 
@@ -143,7 +143,7 @@ role LockedHash {
 }
 
 #---- actual module with exportable subs ---------------------------------------
-module Hash::Util:ver<0.0.4>:auth<cpan:ELIZABETH> {
+module Hash::Util:ver<0.0.5>:auth<zef:lizmat> {
 
     #---- helper subs ----------------------------------------------------------
     my List %candidates;
@@ -552,14 +552,14 @@ L<Scalar::Util>, L<List::Util>
 
 =head1 AUTHOR
 
-Elizabeth Mattijsen <liz@wenzperl.nl>
+Elizabeth Mattijsen <liz@raku.rocks>
 
 Source can be located at: https://github.com/lizmat/Hash-Util . Comments and
 Pull Requests are welcome.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2018-2020 Elizabeth Mattijsen
+Copyright 2018, 2019, 2020, 2021 Elizabeth Mattijsen
 
 This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
 
